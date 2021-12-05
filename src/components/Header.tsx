@@ -41,7 +41,6 @@ export function Header() {
           mr="4"
           placeholder="Buscar na plataforma"
           _placeholder={{ color: 'gray.400' }}
-
         />
 
       </Flex>
