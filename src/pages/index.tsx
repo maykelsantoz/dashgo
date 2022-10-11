@@ -1,86 +1,97 @@
-import { Flex, Button, Stack, useToast } from '@chakra-ui/react'
-import { SubmitHandler, useForm } from 'react-hook-form'
-import * as yup from 'yup'
-import { yupResolver } from '@hookform/resolvers/yup'
-import { Input } from "../components/Form/Input"
+import { Box, Flex, SimpleGrid, Text, theme } from "@chakra-ui/react";
+import { Sidebar } from "../components/Sidebar";
+import { Header } from "../components/Header";
+import { ApexOptions } from "apexcharts"
 
-type SignInFormData = {
-  email: string;
-  password: string;
-};
+import dynamic from 'next/dynamic';
 
-const signInFormSchema = yup.object().shape({
-  email: yup.string().required('E-mail obrigatório').email('E-mail inválido'),
-  password: yup.string().required('Senha obrigatória'),
+const Chart = dynamic(() => import('react-apexcharts'), {
+  ssr: false,
 })
 
-export default function SignIn() {
-  // const toast = useToast()
-
-  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm({
-    resolver: yupResolver(signInFormSchema)
-  })
-
-
-  const handleSignIn: SubmitHandler<SignInFormData> = async (values) => {
-    await new Promise(resolve => setTimeout(resolve, 2000));
+const options: ApexOptions = {
+  chart: {
+    toolbar: {
+      show: false,
+    },
+    zoom: {
+      enabled: false,
+    },
+    foreColor: theme.colors.gray[500],
+  },
+  grid: {
+    show: false,
+  },
+  dataLabels: {
+    enabled: false,
+  },
+  tooltip: {
+    enabled: false,
+  },
+  xaxis: {
+    type: 'datetime',
+    axisBorder: {
+      color: theme.colors.gray[600]
+    },
+    axisTicks: {
+      color: theme.colors.gray[600]
+    },
+    categories: [
+      '2022-10-18T00:00:00.000Z',
+      '2022-10-19T00:00:00.000Z',
+      '2022-10-20T00:00:00.000Z',
+      '2022-10-21T00:00:00.000Z',
+      '2022-10-22T00:00:00.000Z',
+      '2022-10-23T00:00:00.000Z',
+      '2022-10-24T00:00:00.000Z',
+    ],
+  },
+  fill: {
+    opacity: 0.3,
+    type: 'gradient',
+    gradient: {
+      shade: 'dark',
+      opacityFrom: 0.7,
+      opacityTo: 0.3,
+    },
   }
+};
 
-  // function addToast() {
-  //   toast({
-  //     position: 'top-right',
-  //     title: 'Account created.',
-  //     description: "We've created your account for you.",
-  //     status: 'success',
-  //     duration: 2000,
-  //     isClosable: true,
-  //   })
-  // }
+const series = [
+  { name: 'series1', color: '#00e396', data: [31, 120, 10, 28, 61, 18, 109] },
+]
 
+const series2 = [
+  { name: 'series1', data: [18, 40, 10, 28, 120, 18, 24] },
+]
+
+export default function Dashboard() {
   return (
-    <Flex
-      w="100vw"
-      h="100vh"
-      align="center"
-      justify="center"
-    >
-      <Flex
-        as="form"
-        width="100%"
-        maxWidth={360}
-        bg="gray.800"
-        p="8"
-        borderRadius={8}
-        flexDir="column"
-        onSubmit={handleSubmit(handleSignIn)}
-      >
-        <Stack spacing="4">
-          <Input
-            name="email"
-            type="email"
-            label="E-mail"
-            error={errors.email}
-            {...register('email')}
-          />
-          <Input
-            name="password"
-            type="password"
-            label="Senha"
-            error={errors.password}
-            {...register('password')}
-          />
-        </Stack>
+    <Flex direction="column" h="100vh">
+      <Header />
+      <Flex w="100%" my="6" maxWidth={1480} mx="auto" px="6">
+        <Sidebar />
 
-        <Button
-          type="submit"
-          mt="6"
-          colorScheme="pink"
-          size="lg"
-          isLoading={isSubmitting}
-        // onClick={addToast}
-        >
-          Entrar
-        </Button>
+        <SimpleGrid flex="1" gap="4" minChildWidth="320px" alignItems="flex-start" >
+          <Box
+            p={["6", "8"]}
+            bg="gray.800"
+            borderRadius={8}
+            pb="4"
+          >
+            <Text fontSize="lg" mb="4">Inscritos da semana</Text>
+            <Chart options={options} series={series} type="area" height={160} width={510} />
+          </Box>
+          <Box
+            p={["6", "8"]}
+            bg="gray.800"
+            borderRadius={8}
+            pb="4"
+          >
+            <Text fontSize="lg" mb="4">Taxa de aberturas</Text>
+            <Chart options={options} series={series2} type="area" height={160} width={510} />
+          </Box>
+        </SimpleGrid>
       </Flex>
     </Flex>
   )
