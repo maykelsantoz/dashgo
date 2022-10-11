@@ -5,15 +5,12 @@ name: Node.js CI
     
 on:
   push:
-    branches:
-      - main
+    branches: [main]
   pull_request:
-    branches:
-      - main
+    branches: [main]
       
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     strategy:
@@ -22,16 +19,20 @@ jobs:
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
+    - name: Checkout 🛎️
     - uses: actions/checkout@v3
+    
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v3
       with:
         node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-    - run: npm run build
+        
+    - name: Install and Build 🔧
+      run: yarn && yarn build && yarn export
     
     - name: Deploy 🚀
       uses: JamesIves/github-pages-deploy-action@v4
       with:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         branch: gh-pages
-        folder: build
+        folder: out
